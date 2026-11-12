@@ -48,6 +48,18 @@ proyek ini). Buat sekali saja di mesinmu:
   lalu jalankan perintah di atas. Setelah itu `gradlew`, `gradlew.bat`, dan
   `gradle/wrapper/gradle-wrapper.jar` akan muncul; **commit ketiganya** supaya
   clone berikutnya langsung bisa membangun.
+- [ ] Siapkan konfigurasi lokal dari berkas contoh (keduanya tidak di-commit):
+
+  ```bash
+  cp local.properties.example local.properties   # lokasi Android SDK (sdk.dir)
+  cp env.sh.example env.sh                       # JAVA_HOME (JDK 17) + ANDROID_HOME
+  # edit kedua berkas sesuai mesinmu, lalu di tiap terminal baru:
+  source env.sh
+  ```
+
+  `env.sh` penting apabila JDK bawaan sistem bukan 17 (mis. Arch Linux dengan
+  JDK terbaru): build butuh JDK 17. Android Studio membuat `local.properties`
+  sendiri, jadi langkah itu hanya perlu untuk build lewat terminal.
 - [ ] Buka proyek di Android Studio, tunggu *Gradle Sync* selesai tanpa error.
   Error unduhan dependensi hampir selalu berarti jaringan/proxy — coba lagi
   dengan jaringan lain sebelum mengubah versi apa pun.
