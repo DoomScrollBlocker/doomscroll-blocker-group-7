@@ -141,6 +141,34 @@ class RulesEngineTest {
     }
 
     @Test
+    fun `urutan layar menyala seperti di service melanjutkan penghitungan`() {
+        // Service memanggil onScreenOn() lalu onForegroundChanged(paket terakhir).
+        // Tanpa onScreenOn(), screenOn tetap false dan timer tidak pernah jalan lagi.
+        val clock = FakeClock()
+        val e = engine(clock)
+        e.onForegroundChanged(appA)
+        clock.advance(20_000L)
+        e.onScreenOff()
+        clock.advance(60_000L)
+        e.onScreenOn()
+        assertTrue(e.onForegroundChanged(appA) is Decision.LimitIn)
+        clock.advance(40_000L)
+        assertTrue(e.onTick() is Decision.Block)
+    }
+
+    @Test
+    fun `memanggil foreground berulang untuk aplikasi sama tidak menggandakan waktu`() {
+        val clock = FakeClock()
+        val e = engine(clock)
+        e.onForegroundChanged(appA)
+        clock.advance(10_000L)
+        e.onForegroundChanged(appA)
+        clock.advance(10_000L)
+        e.onForegroundChanged(appA)
+        assertEquals(20_000L, e.currentUsedMs())
+    }
+
+    @Test
     fun `reboot selama cooldown tidak menghapus blokir`() {
         val clock = FakeClock()
         val e = engine(clock)

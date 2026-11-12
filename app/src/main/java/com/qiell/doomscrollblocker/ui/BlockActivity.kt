@@ -68,8 +68,26 @@ class BlockActivity : ComponentActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        isVisible = true
+    }
+
+    override fun onStop() {
+        isVisible = false
+        super.onStop()
+    }
+
     companion object {
         const val EXTRA_REMAINING_MS = "extra_remaining_ms"
+
+        /**
+         * True selama layar blokir benar-benar tampil. Service memakainya untuk
+         * tahu apakah sistem menolak startActivity dari latar belakang (MIUI).
+         */
+        @Volatile
+        var isVisible: Boolean = false
+            private set
     }
 }
 
