@@ -29,6 +29,8 @@ class DataStoreRepository(private val context: Context) {
         val BlockedPackages = stringSetPreferencesKey("blocked_packages")
         val AllowanceMs = longPreferencesKey("allowance_ms")
         val CooldownMs = longPreferencesKey("cooldown_ms")
+        val LastCustomAllowanceMinutes = intPreferencesKey("last_custom_allowance_min")
+        val LastCustomCooldownMinutes = intPreferencesKey("last_custom_cooldown_min")
 
         val UsedMs = longPreferencesKey("used_ms")
         val ForegroundSinceElapsed = longPreferencesKey("foreground_since_elapsed")
@@ -53,6 +55,8 @@ class DataStoreRepository(private val context: Context) {
             cooldownMs = prefs[Keys.CooldownMs] ?: BlockerSettings.DEFAULT_COOLDOWN_MS,
             // Whitelist tidak disimpan: selalu dihitung ulang dari perangkat (dinamis).
             whitelistedPackages = emptySet(),
+            lastCustomAllowanceMinutes = prefs[Keys.LastCustomAllowanceMinutes],
+            lastCustomCooldownMinutes = prefs[Keys.LastCustomCooldownMinutes],
         )
     }
 
@@ -67,6 +71,10 @@ class DataStoreRepository(private val context: Context) {
             prefs[Keys.BlockedPackages] = settings.blockedPackages
             prefs[Keys.AllowanceMs] = settings.allowanceMs
             prefs[Keys.CooldownMs] = settings.cooldownMs
+            settings.lastCustomAllowanceMinutes?.let { prefs[Keys.LastCustomAllowanceMinutes] = it }
+                ?: prefs.remove(Keys.LastCustomAllowanceMinutes)
+            settings.lastCustomCooldownMinutes?.let { prefs[Keys.LastCustomCooldownMinutes] = it }
+                ?: prefs.remove(Keys.LastCustomCooldownMinutes)
         }
     }
 

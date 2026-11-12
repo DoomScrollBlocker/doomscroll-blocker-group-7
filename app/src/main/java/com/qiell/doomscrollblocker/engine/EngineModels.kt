@@ -16,10 +16,20 @@ data class BlockerSettings(
     val allowanceMs: Long = DEFAULT_ALLOWANCE_MS,
     val cooldownMs: Long = DEFAULT_COOLDOWN_MS,
     val whitelistedPackages: Set<String> = emptySet(),
+    /**
+     * Menit khusus terakhir yang pernah disimpan pengguna. Hanya untuk UI
+     * (supaya kolom "khusus" tidak kosong lagi); engine tidak memakainya.
+     */
+    val lastCustomAllowanceMinutes: Int? = null,
+    val lastCustomCooldownMinutes: Int? = null,
 ) {
     companion object {
         const val DEFAULT_ALLOWANCE_MS: Long = 15 * 60_000L
         const val DEFAULT_COOLDOWN_MS: Long = 60 * 60_000L
+
+        /** Batas atas yang masuk akal untuk input khusus (menit). */
+        const val MAX_ALLOWANCE_MINUTES: Int = 240
+        const val MAX_COOLDOWN_MINUTES: Int = 1_440
     }
 }
 
