@@ -1,0 +1,50 @@
+# ---- Konfigurasi lokal & rahasia (jangan pernah di-commit) --------------------
+# Berisi path mesin sendiri. Contohnya ada di local.properties.example.
+local.properties
+# Salinan lokal dari env.sh.example.
+env.sh
+# Penandatanganan rilis (belum dipakai di v1, tetapi jangan sampai bocor nanti).
+keystore.properties
+*.jks
+*.keystore
+*.p12
+*.pem
+# Berkas kredensial / layanan Google apabila suatu hari ditambahkan.
+google-services.json
+.env
+.env.*
+
+# ---- Gradle & Kotlin ----------------------------------------------------------
+.gradle/
+build/
+.kotlin/
+# Wrapper (gradlew, gradlew.bat, gradle/wrapper/gradle-wrapper.jar) SENGAJA
+# tidak diabaikan: ketiganya harus di-commit supaya clone bisa langsung membangun.
+
+# ---- Hasil build Android -------------------------------------------------------
+*.apk
+*.aab
+*.ap_
+*.dex
+captures/
+.externalNativeBuild/
+.cxx/
+
+# ---- Android Studio / IntelliJ -------------------------------------------------
+.idea/
+*.iml
+.navigation/
+
+# ---- Sistem operasi & editor ---------------------------------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*~
+
+# ---- Log & dump -----------------------------------------------------------------
+*.log
+hs_err_pid*
+replay_pid*
+
+# ---- Alat bantu lokal -----------------------------------------------------------
+.claude/settings.local.json

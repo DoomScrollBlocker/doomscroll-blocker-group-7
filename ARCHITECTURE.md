@@ -67,13 +67,34 @@ service menjadwalkan satu timer selama itu. Timer memanggil `onTick()`, yang
 menilai ulang dan memicu blokir tepat saat jatah habis. Timer dibatalkan saat
 pengguna keluar dari aplikasi terdaftar atau layar mati.
 
-## Penyaringan derau foreground
+## Deteksi foreground: daftar jendela, bukan paket event terakhir
 
-Paket berikut diabaikan saat menentukan foreground, karena mereka memancarkan
-event jendela yang akan menjeda/memulai ulang timer secara keliru:
-`com.android.systemui`, metode masukan (keyboard) yang sedang aktif
-(dibaca dari `Settings.Secure.DEFAULT_INPUT_METHOD`), dialog izin
-(`permissioncontroller`), dan paket aplikasi ini sendiri.
+(Diubah 2026-11-12.) Menganggap paket dari event terakhir sebagai "aplikasi di
+depan" salah di dua kasus: panel volume / kontrol jendela mengambang memancarkan
+event dengan paket lain sehingga timer berhenti padahal aplikasi terdaftar masih
+terbuka, dan pada jendela mengambang atau split-screen beberapa aplikasi terlihat
+sekaligus.
+
+Service sekarang membaca daftar jendela (`AccessibilityService.windows`), hanya
+jendela bertipe `TYPE_APPLICATION`, dan dari tiap jendela hanya nama paket root.
+`ForegroundPicker` memilih paket terdaftar bila ada di antara jendela yang
+terlihat; bila tidak, jendela paling atas. Panel volume, bayangan notifikasi, dan
+keyboard bukan jendela aplikasi sehingga tidak menggeser foreground.
+
+Harga yang harus diketahui: Android hanya memberi daftar jendela kepada layanan
+yang menyatakan `canRetrieveWindowContent="true"` (+ `flagRetrieveInteractiveWindows`).
+Jadi izin yang tampil di pengaturan aksesibilitas berbunyi "melihat isi layar".
+Kodenya tetap hanya membaca tipe jendela dan nama paket; kartu pengungkapan di UI
+sudah dijelaskan ulang. Bila daftar jendela tidak tersedia, service memakai paket
+event sebagai cadangan.
+
+Paket yang dibuang dari daftar (derau): `com.android.systemui`, keyboard aktif
+(`Settings.Secure.DEFAULT_INPUT_METHOD`), dialog izin (`permissioncontroller`),
+dan aplikasi ini sendiri.
+
+Service juga memanggil `onScreenOn()` saat layar menyala (sebelumnya hanya
+`onScreenOff()` yang dipanggil, sehingga timer mati permanen setelah layar
+dikunci pertama kali), dan menjalankan engine di satu thread.
 
 ## Ketahanan terhadap manipulasi jam
 
@@ -97,6 +118,15 @@ ditunda ke v2 karena Compose di dalam overlay membutuhkan penyiapan manual
 `LifecycleOwner`/`SavedStateRegistryOwner` dan tidak bisa diverifikasi tanpa
 perangkat nyata; keandalan demo lebih penting. Setelah layar blokir tampil,
 service memanggil `performGlobalAction(GLOBAL_ACTION_HOME)` ±2,5 detik kemudian.
+
+**Cadangan bila layar blokir ditolak sistem (2026-11-12).** Di Xiaomi/MIUI,
+`startActivity` dari service ditolak diam-diam (log: `MIUILOG- Permission Denied
+Activity`) selama izin "Tampilkan jendela pop-up saat berjalan di latar belakang"
+(app-op 10021) belum diberikan. `BlockActivity.isVisible` memberi tahu service
+apakah layar benar-benar tampil; bila tidak, service langsung ke Home (+ Toast)
+sehingga aplikasi tidak sempat dipakai. Selama cooldown, bila aplikasi terdaftar
+masih terlihat (mis. jendela mengambang), blokir diulang tiap 3,5 detik.
+UI utama menampilkan kartu "Izin Xiaomi" yang membuka halaman izin MIUI.
 
 ## Break-glass
 

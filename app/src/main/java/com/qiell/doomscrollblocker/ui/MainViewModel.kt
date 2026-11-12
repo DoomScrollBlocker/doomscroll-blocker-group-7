@@ -67,12 +67,43 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         saveSettings(current.copy(blockedPackages = updated - whitelistedPackages))
     }
 
-    fun setAllowanceMs(ms: Long) {
-        if (ms > 0) saveSettings(settings.value.copy(allowanceMs = ms))
+    /** [custom] true bila nilai berasal dari input khusus: nilainya diingat untuk kolom khusus. */
+    fun setAllowanceMinutes(minutes: Int, custom: Boolean) {
+        if (minutes !in 1..BlockerSettings.MAX_ALLOWANCE_MINUTES) return
+        val current = settings.value
+        saveSettings(
+            current.copy(
+                allowanceMs = minutes * 60_000L,
+                lastCustomAllowanceMinutes = if (custom) minutes else current.lastCustomAllowanceMinutes,
+            )
+        )
     }
 
-    fun setCooldownMs(ms: Long) {
-        if (ms > 0) saveSettings(settings.value.copy(cooldownMs = ms))
+    fun setCooldownMinutes(minutes: Int, custom: Boolean) {
+        if (minutes !in 1..BlockerSettings.MAX_COOLDOWN_MINUTES) return
+        val current = settings.value
+        saveSettings(
+            current.copy(
+                cooldownMs = minutes * 60_000L,
+                lastCustomCooldownMinutes = if (custom) minutes else current.lastCustomCooldownMinutes,
+            )
+        )
+    }
+
+    /**
+     * Mengembalikan jatah dan cooldown ke nilai bawaan dan menghapus menit khusus
+     * yang diingat. Daftar aplikasi tidak disentuh. Cooldown yang sedang berjalan
+     * tetap beku (state engine tidak diubah di sini).
+     */
+    fun resetTimeSettings() {
+        saveSettings(
+            settings.value.copy(
+                allowanceMs = BlockerSettings.DEFAULT_ALLOWANCE_MS,
+                cooldownMs = BlockerSettings.DEFAULT_COOLDOWN_MS,
+                lastCustomAllowanceMinutes = null,
+                lastCustomCooldownMinutes = null,
+            )
+        )
     }
 
     private fun saveSettings(newSettings: BlockerSettings) {

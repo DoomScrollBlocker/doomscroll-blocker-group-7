@@ -31,6 +31,9 @@ berisi instalasi Android Studio / JDK 17 / SDK 35, cara membuat
 menjalankan unit test, memasang APK ke ponsel, dan daftar periksa pengujian
 manual untuk semua kriteria penerimaan.
 
+Konfigurasi lokal (path SDK dan JDK 17) disalin dari `local.properties.example`
+dan `env.sh.example`; berkas hasil salinannya tidak ikut di-commit.
+
 Ringkasnya, setelah wrapper tersedia:
 
 ```bash

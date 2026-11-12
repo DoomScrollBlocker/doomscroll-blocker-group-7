@@ -2,5 +2,6 @@
 <resources>
     <string name="app_name">Doomscroll Blocker</string>
     <string name="accessibility_service_label">Doomscroll Blocker — deteksi aplikasi</string>
-    <string name="accessibility_service_description">Mendeteksi aplikasi mana yang sedang dibuka untuk menegakkan batas waktu yang kamu atur sendiri. Tidak ada isi layar yang dibaca atau disimpan.</string>
+    <string name="accessibility_service_description">Mendeteksi aplikasi mana yang terlihat di layar (termasuk jendela mengambang) untuk menegakkan batas waktu yang kamu atur sendiri. Hanya nama paket aplikasi yang dibaca; teks, ketikan, dan isi layar tidak dibaca atau disimpan.</string>
+    <string name="block_fallback_toast">Batas tercapai. Aplikasi ini terkunci sampai cooldown selesai.</string>
 </resources>
