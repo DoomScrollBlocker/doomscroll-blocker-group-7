@@ -13,6 +13,47 @@ di sana. Verifikasi dilakukan pemilik proyek mengikuti
 Karena itu status di bawah adalah "ditulis", bukan "terverifikasi", sampai
 daftar periksa di panduan itu dijalankan dan hasilnya dicatat di sini.
 
+## Pembaruan 2026-11-12 — kompilasi, unit test, dan perbaikan dari uji perangkat
+
+- Proyek sudah dikompilasi dan dipasang di Xiaomi 2201116SG (MIUI 14, Android 13).
+  Unit test: 19 test hijau (15 engine + 4 `ForegroundPicker`).
+- Tiga masalah dari uji perangkat, penyebab (dari log perangkat) dan perbaikannya:
+  1. **Tidak benar-benar memblokir** — MIUI menolak `BlockActivity` dari latar
+     belakang. Perbaikan: cadangan langsung ke Home + Toast, kartu izin Xiaomi.
+     Terverifikasi di perangkat: Reddit terblokir tepat di 60 detik, dan dibuka
+     lagi saat cooldown → ke Home dalam ±1 detik.
+  2. **Timer tidak menghitung di jendela mengambang** — foreground ditentukan dari
+     paket event terakhir. Perbaikan: baca daftar jendela terlihat. Juga ditemukan
+     bug terpisah: service tidak pernah memanggil `onScreenOn()`, sehingga timer
+     mati setelah layar dikunci sekali. Keduanya diperbaiki.
+  3. **Timer mati saat volume dinaikkan** — jendela panel volume (`MiuiVolumeDialogImpl`)
+     bukan jendela aplikasi, kini diabaikan. Terverifikasi di perangkat: panel
+     volume muncul, tidak ada perubahan foreground. Tidak dites lewat tombol
+     fisik (injeksi tombol diblokir di perangkat ini).
+- **Belum diverifikasi:** perilaku jendela mengambang MIUI yang sebenarnya
+  (menghitung waktu, dan apakah Home menyingkirkan jendela mengambang saat blokir).
+  Perlu dicoba langsung di ponsel.
+- Perubahan izin: layanan kini meminta `canRetrieveWindowContent=true`
+  (diperlukan Android untuk daftar jendela). Teks pengungkapan sudah disesuaikan.
+
+## Pembaruan 2026-11-12 (2) — UI/UX dan fitur reset
+
+- Layar utama, pemilih aplikasi, dan pengaturan waktu dirancang ulang (Material 3,
+  `Scaffold` + app bar, tema warna baru, ikon aplikasi, status berwarna).
+  Tombol Back dari layar dalam kini kembali ke beranda.
+- **Pengaturan waktu:** pemilih durasi baru. Kolom "Khusus" tidak lagi kosong:
+  berisi nilai khusus aktif, atau nilai khusus terakhir yang diingat
+  (`last_custom_allowance_min` / `last_custom_cooldown_min` di DataStore).
+  Nilai khusus hanya disimpan lewat tombol Simpan (tidak ada simpan saat mengetik),
+  dengan batas 1–240 menit (jatah) dan 1–1440 menit (cooldown).
+- **Reset:** "Reset pengaturan waktu" mengembalikan jatah 15 menit dan cooldown
+  60 menit, menghapus nilai khusus yang diingat. Daftar aplikasi dan cooldown yang
+  sedang berjalan tidak berubah. Sengaja TIDAK ada reset waktu terpakai / cooldown
+  (itu akan melumpuhkan pemblokiran; jalan keluarnya tetap break-glass).
+- Terverifikasi: build + unit test hijau; layar utama dilihat di ponsel lewat
+  screenshot. **Belum dilihat:** layar Pengaturan dan Pemilih aplikasi, serta alur
+  reset (injeksi sentuhan diblokir di ponsel ini) — perlu dicoba langsung.
+
 ## Yang sudah ditulis (semua milestone 1–5)
 
 - [x] **Milestone 1 — Mesin aturan.** `RulesEngine` Kotlin murni + model +
